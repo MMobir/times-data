@@ -7,6 +7,7 @@ TIMES (The Integrated MARKAL-EFOM System) is the world's most widely used energy
 Building a TIMES model often involves specialized training plus desktop and spreadsheet tooling. Collaboration and automation can be hard for teams that also want software-engineering workflows like scripting, version control, and CI.
 
 `times-data` is a step toward changing that. It provides a typed, validated, scriptable data layer for TIMES models that works on any platform — Mac, Linux, Windows — from the command line or from Python.
+It supports two entry points: **start from scratch in Python** or **import existing DD files**.
 
 ## Why
 
@@ -85,35 +86,12 @@ Requires Python 3.11+. No other dependencies besides PyYAML and Click.
 
 ## Quick Start
 
-There are two supported starting points:
+There are two equally supported starting points:
 
-1. Import an existing model from DD files
-2. Build a new model directly in Python
+1. Build a new model directly in Python
+2. Import an existing model from DD files
 
-### Start from existing DD artifacts
-
-If you already have DD files from a TIMES model run:
-
-```bash
-times-data import-dd /path/to/dd-files/ -o my-model --name "MyModel"
-```
-
-This reads the DD files and writes a directory of human-readable YAML files:
-
-```
-my-model/
-  config.yaml              # regions, periods, timeslices
-  commodities/
-    elc.yaml               # each commodity in its own file
-    coal.yaml
-    co2.yaml
-  processes/
-    coal-pp.yaml           # each process with its topology
-    wind-onshore.yaml
-  parameters/
-    ncap-cost.yaml         # investment costs
-    act-bnd.yaml           # activity bounds
-```
+You do **not** need DD files to use `times-data`.
 
 ### Start from scratch in Python
 
@@ -147,6 +125,31 @@ model.set_parameter("NCAP_TLIFE", 25, r="REG1", datayear=2030, p="SOLAR_PV")
 
 write_model(model, Path("my-model"))
 compile_dd(model, Path("build"))
+```
+
+### Start from existing DD artifacts
+
+If you already have DD files from a TIMES model run:
+
+```bash
+times-data import-dd /path/to/dd-files/ -o my-model --name "MyModel"
+```
+
+This reads the DD files and writes a directory of human-readable YAML files:
+
+```
+my-model/
+  config.yaml              # regions, periods, timeslices
+  commodities/
+    elc.yaml               # each commodity in its own file
+    coal.yaml
+    co2.yaml
+  processes/
+    coal-pp.yaml           # each process with its topology
+    wind-onshore.yaml
+  parameters/
+    ncap-cost.yaml         # investment costs
+    act-bnd.yaml           # activity bounds
 ```
 
 ### Inspect and validate
