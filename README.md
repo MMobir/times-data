@@ -79,10 +79,36 @@ DemoS_008–012 compile valid DD files but exceed the active GAMS community lice
 ```bash
 git clone https://github.com/MMobir/times-data
 cd times-data
-pip install -e .
+python3 -m pip install -e .
 ```
 
 Requires Python 3.11+. No other dependencies besides PyYAML and Click.
+
+On Windows, use:
+
+```powershell
+py -m pip install -e .
+```
+
+Quick sanity check after install:
+
+```bash
+times-data --help
+times-data new DemoQuick --regions REG1 --periods 2020,2030
+times-data validate DemoQuick/
+```
+
+If the `times-data` command is not found, use:
+
+```bash
+python3 -m times_data.cli.main --help
+```
+
+On Windows:
+
+```powershell
+py -m times_data.cli.main --help
+```
 
 ## Quick Start
 
@@ -295,10 +321,21 @@ Each process and commodity carries typed parameters (costs, efficiencies, bounds
 
 ## Running tests
 
+Install dev dependencies first (includes `pytest`):
+
 ```bash
-pip install -e ".[dev]"
-pytest tests/ -v
+python3 -m pip install -e ".[dev]"
+python3 -m pytest tests/ -v
 ```
+
+On Windows, use:
+
+```powershell
+py -m pip install -e ".[dev]"
+py -m pytest tests/ -v
+```
+
+If `pytest` is not recognized, run it as a module (`python3 -m pytest` or `py -m pytest`) as shown above.
 
 The 7 integration tests require GAMS installed with the TIMES source code at `/tmp/TIMES_model`. They skip gracefully if GAMS is not available. The remaining 28 unit tests run without any external dependencies.
 
