@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 import sys
 from pathlib import Path
 
@@ -66,13 +67,15 @@ def export_dd_cmd(model_path: str, output: str) -> None:
     model = read_model(Path(model_path))
 
     msgs = validate_all(model)
-    errors = [m for m in msgs if m.level == "error"]
+    errors, warnings = _print_validation_report(msgs, show_warnings=True)
     if errors:
-        click.echo(click.style(f"\n{len(errors)} validation error(s):", fg="red"))
-        for msg in errors:
-            click.echo(click.style(f"  {msg.message}", fg="red"))
         click.echo("\nFix errors before compiling.")
         sys.exit(1)
+    if warnings:
+        click.echo(click.style(
+            f"\nProceeding with {len(warnings)} validation warning(s).",
+            fg="yellow",
+        ))
 
     out = Path(output)
     generated = compile_dd(model, out)
@@ -95,19 +98,7 @@ def validate(path: str) -> None:
     model = read_model(Path(path))
     msgs = validate_all(model)
 
-    errors = [m for m in msgs if m.level == "error"]
-    warnings = [m for m in msgs if m.level == "warning"]
-
-    for msg in errors:
-        prefix = f"[{msg.entity}] " if msg.entity else ""
-        click.echo(click.style(f"  ERROR  {prefix}{msg.message}", fg="red"))
-
-    for msg in warnings:
-        prefix = f"[{msg.entity}] " if msg.entity else ""
-        click.echo(click.style(f"  WARN   {prefix}{msg.message}", fg="yellow"))
-
-    click.echo()
-    click.echo(f"{len(errors)} error(s), {len(warnings)} warning(s)")
+    errors, warnings = _print_validation_report(msgs, show_warnings=True)
 
     if errors:
         sys.exit(1)
@@ -164,6 +155,46 @@ def _print_summary(model) -> None:
     click.echo(f"  Commodities: {s['commodities']}")
     click.echo(f"  Processes:   {s['processes']}")
     click.echo(f"  Parameters:  {s['parameter_values']} values")
+
+
+def _print_validation_report(msgs, show_warnings: bool) -> tuple[list, list]:
+    errors = [m for m in msgs if m.level == "error"]
+    warnings = [m for m in msgs if m.level == "warning"]
+
+    if errors:
+        click.echo(click.style(f"\nERRORS ({len(errors)})", fg="red"))
+        for msg in errors:
+            _echo_validation_message(msg, color="red")
+
+    if show_warnings and warnings:
+        click.echo(click.style(f"\nWARNINGS ({len(warnings)})", fg="yellow"))
+        for msg in warnings:
+            _echo_validation_message(msg, color="yellow")
+
+    if msgs:
+        click.echo()
+        click.echo("Summary by category:")
+        buckets = defaultdict(lambda: {"error": 0, "warning": 0})
+        for msg in msgs:
+            buckets[msg.category][msg.level] += 1
+        for category in sorted(buckets):
+            c = buckets[category]
+            click.echo(f"  {category}: {c['error']} error(s), {c['warning']} warning(s)")
+    click.echo()
+    click.echo(f"{len(errors)} error(s), {len(warnings)} warning(s)")
+    return errors, warnings
+
+
+def _echo_validation_message(msg, color: str) -> None:
+    entity_prefix = f"[{msg.entity}] " if msg.entity else ""
+    click.echo(
+        click.style(
+            f"  - [{msg.category}] {entity_prefix}{msg.message}",
+            fg=color,
+        )
+    )
+    if msg.hint:
+        click.echo(f"      fix: {msg.hint}")
 
 
 if __name__ == "__main__":
