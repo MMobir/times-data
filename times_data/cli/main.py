@@ -120,6 +120,31 @@ def info(path: str) -> None:
 
 
 @cli.command()
+@click.argument("model_a", type=click.Path(exists=True))
+@click.argument("model_b", type=click.Path(exists=True))
+@click.option(
+    "--max-items",
+    default=20,
+    show_default=True,
+    type=int,
+    help="Maximum entries shown per added/removed/changed list.",
+)
+def diff(model_a: str, model_b: str, max_items: int) -> None:
+    """Compare two TIMES models and show data-level differences."""
+    from times_data.diff import compare_models, format_model_diff
+    from times_data.io import read_model
+
+    if max_items < 1:
+        click.echo(click.style("--max-items must be >= 1", fg="red"))
+        sys.exit(1)
+
+    left = read_model(Path(model_a))
+    right = read_model(Path(model_b))
+    changes = compare_models(left, right)
+    click.echo(format_model_diff(changes, model_a, model_b, max_items=max_items))
+
+
+@cli.command()
 @click.argument("name")
 @click.option("--regions", default="REG1", help="Comma-separated region names")
 @click.option("--periods", default="2020,2030,2040,2050", help="Comma-separated period years")

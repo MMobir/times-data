@@ -185,6 +185,14 @@ times-data info my-model/
 times-data validate my-model/
 ```
 
+### Compare two model versions
+
+```bash
+times-data diff model-v1/ model-v2/
+```
+
+This prints added/removed/changed commodities, processes, and parameter values.
+
 ### Edit in Python
 
 ```python

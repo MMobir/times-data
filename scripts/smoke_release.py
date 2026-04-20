@@ -24,6 +24,7 @@ def main() -> None:
         run("new", "DemoQuick", "--regions", "REG1", "--periods", "2020,2030", cwd=workdir)
         run("info", "DemoQuick", cwd=workdir)
         run("validate", "DemoQuick", cwd=workdir)
+        run("diff", "DemoQuick", "DemoQuick", cwd=workdir)
         run("export-dd", "DemoQuick", "-o", "DemoQuick-build", cwd=workdir)
 
         expected = {
