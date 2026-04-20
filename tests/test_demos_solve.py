@@ -16,10 +16,18 @@ from times_data.compiler import compile_dd
 DEMOS_DD = Path(__file__).parent.parent.parent / "demos" / "dd"
 TIMES_SRC = Path("/tmp/TIMES_model")
 GAMS_PATH = Path("/Library/Frameworks/GAMS.framework/Resources/gams")
+REQUIRED_TIMES_FILES = ("initsys.mod", "initmty.mod", "maindrv.mod")
 
-SKIP_MSG = "GAMS or TIMES source not available"
+
+def _has_complete_times_source() -> bool:
+    return TIMES_SRC.exists() and all((TIMES_SRC / f).exists() for f in REQUIRED_TIMES_FILES)
+
+SKIP_MSG = (
+    "GAMS or complete TIMES source not available "
+    "(need /tmp/TIMES_model with initsys.mod, initmty.mod, maindrv.mod)"
+)
 requires_gams = pytest.mark.skipif(
-    not GAMS_PATH.exists() or not TIMES_SRC.exists(),
+    not GAMS_PATH.exists() or not _has_complete_times_source(),
     reason=SKIP_MSG,
 )
 
@@ -29,6 +37,14 @@ def _solve_dd(dd_dir: Path, name: str, ts_file: str, dd_files: list[str],
     """Solve DD files through GAMS, return (status, objective)."""
     dd_includes = "\n".join(f"$BATINCLUDE {f}" for f in dd_files)
     ms_line = f"SET MILESTONYR / {milestones} /;" if milestones else ""
+    end_file = dd_dir / "END_GAMS"
+    lst = dd_dir / f"{name}.lst"
+
+    # Avoid stale status/results from previous solves in reused folders.
+    if end_file.exists():
+        end_file.unlink()
+    if lst.exists():
+        lst.unlink()
 
     run_content = f"""\
 $TITLE TIMES -- {name}
@@ -60,13 +76,12 @@ $ BATINCLUDE maindrv.mod mod
     run_file = dd_dir / f"{name}.RUN"
     run_file.write_text(run_content)
 
-    result = subprocess.run(
+    subprocess.run(
         [str(GAMS_PATH), str(run_file), f"idir1={dd_dir}", f"idir2={TIMES_SRC}",
          "ps=0", f"gdx={dd_dir / name}", f"O={dd_dir / name}.lst"],
         capture_output=True, text=True, timeout=120, cwd=str(dd_dir),
     )
 
-    lst = dd_dir / f"{name}.lst"
     if not lst.exists():
         return "NO_LST", ""
 
@@ -81,7 +96,6 @@ $ BATINCLUDE maindrv.mod mod
     if any(marker in lst_lower for marker in license_markers):
         return "LICENSE", ""
 
-    end_file = dd_dir / "END_GAMS"
     status = end_file.read_text().strip() if end_file.exists() else "UNKNOWN"
     obj = ""
     for line in lst_text.split("\n"):

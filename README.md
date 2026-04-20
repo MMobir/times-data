@@ -337,6 +337,12 @@ py -m pytest tests/ -v
 
 If `pytest` is not recognized, run it as a module (`python3 -m pytest` or `py -m pytest`) as shown above.
 
+Optional release smoke check:
+
+```bash
+python3 scripts/smoke_release.py
+```
+
 The 7 integration tests require GAMS installed with the TIMES source code at `/tmp/TIMES_model`. They skip gracefully if GAMS is not available. The remaining 28 unit tests run without any external dependencies.
 
 ## What this is not
@@ -359,6 +365,8 @@ This is an early release. We're looking for:
 - **Bug reports** especially around DD file compatibility across different modeling workflows
 
 Open an issue or pull request on [GitHub](https://github.com/MMobir/times-data).
+
+Maintainers can use `docs/specs/release-checklist.md` before tagging releases.
 
 ## License
 
