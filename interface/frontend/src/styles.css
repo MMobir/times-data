@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 215 80% 38%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 16% 93%;
+    --secondary-foreground: 222 47% 18%;
+
+    --muted: 210 16% 95%;
+    --muted-foreground: 215 16% 42%;
+
+    --accent: 215 70% 95%;
+    --accent-foreground: 215 80% 28%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 45%;
+    --warning-foreground: 28 50% 12%;
+
+    --success: 145 55% 32%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 215 18% 87%;
+    --input: 215 18% 87%;
+    --ring: 215 80% 38%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 35% 7%;
+    --foreground: 210 30% 96%;
+
+    --card: 222 32% 10%;
+    --card-foreground: 210 30% 96%;
+
+    --popover: 222 32% 10%;
+    --popover-foreground: 210 30% 96%;
+
+    --primary: 210 90% 65%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 222 22% 16%;
+    --secondary-foreground: 210 30% 96%;
+
+    --muted: 222 22% 14%;
+    --muted-foreground: 215 18% 65%;
+
+    --accent: 222 22% 18%;
+    --accent-foreground: 210 30% 96%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 28 50% 8%;
+
+    --success: 145 55% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 222 18% 22%;
+    --input: 222 18% 22%;
+    --ring: 210 90% 65%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: theme("fontFamily.sans");
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  .panel {
+    @apply rounded-lg border border-border bg-card shadow-sm;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
+
+/* AG Grid theme overrides bind to current shadcn tokens */
+.ag-theme-times {
+  --ag-background-color: hsl(var(--card));
+  --ag-foreground-color: hsl(var(--card-foreground));
+  --ag-header-background-color: hsl(var(--muted));
+  --ag-header-foreground-color: hsl(var(--muted-foreground));
+  --ag-odd-row-background-color: hsl(var(--background));
+  --ag-row-hover-color: hsl(var(--accent));
+  --ag-selected-row-background-color: hsl(var(--accent));
+  --ag-border-color: hsl(var(--border));
+  --ag-row-border-color: hsl(var(--border));
+  --ag-header-column-separator-color: hsl(var(--border));
+  --ag-font-family: inherit;
+  --ag-font-size: 13px;
+  --ag-grid-size: 6px;
+  --ag-list-item-height: 28px;
+  --ag-cell-horizontal-padding: 12px;
+}
+
+.ag-theme-times .ag-header,
+.ag-theme-times .ag-root-wrapper {
+  border-color: hsl(var(--border));
+}

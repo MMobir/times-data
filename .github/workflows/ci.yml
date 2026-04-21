@@ -43,3 +43,28 @@ jobs:
 
       - name: Smoke interface backend flow
         run: python scripts/smoke_interface.py
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: interface/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: interface/frontend
+        run: npm ci
+
+      - name: Frontend tests
+        working-directory: interface/frontend
+        run: npm run test
+
+      - name: Frontend build
+        working-directory: interface/frontend
+        run: npm run build
