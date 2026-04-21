@@ -82,7 +82,8 @@ cd times-data
 python3 -m pip install -e .
 ```
 
-Requires Python 3.11+. No other dependencies besides PyYAML and Click.
+Requires Python 3.11+.
+Core package dependencies are lightweight (`PyYAML`, `Click`) plus interface server runtime (`FastAPI`, `Uvicorn`).
 
 On Windows, use:
 
@@ -192,6 +193,29 @@ times-data diff model-v1/ model-v2/
 ```
 
 This prints added/removed/changed commodities, processes, and parameter values.
+
+## Local interface (preview)
+
+`times-data` now includes a local-first interface stack:
+
+- **Backend API:** `interface/backend` (FastAPI)
+- **Frontend app:** `interface/frontend` (React + TypeScript + Vite)
+
+Start backend:
+
+```bash
+python3 -m interface.backend.app
+```
+
+In a second terminal, run frontend:
+
+```bash
+cd interface/frontend
+npm install
+npm run dev
+```
+
+By default, the frontend calls `http://127.0.0.1:8000`. Override with `VITE_API_BASE_URL` if needed.
 
 ### Edit in Python
 
@@ -345,11 +369,36 @@ py -m pytest tests/ -v
 
 If `pytest` is not recognized, run it as a module (`python3 -m pytest` or `py -m pytest`) as shown above.
 
-Optional release smoke check:
+Run backend API tests:
+
+```bash
+python3 -m pytest interface/backend/tests -v
+```
+
+Run frontend tests/build:
+
+```bash
+cd interface/frontend
+npm install
+npm run test
+npm run build
+```
+
+Optional release smoke checks:
 
 ```bash
 python3 scripts/smoke_release.py
+python3 scripts/smoke_interface.py
+bash scripts/smoke_frontend.sh
 ```
+
+Want a quick demonstration of how the interface workflow helps?
+
+```bash
+python3 scripts/demo_interface_value.py
+```
+
+It walks through open -> edit -> patch -> validate -> diff -> export -> results and prints why each step is useful.
 
 The 7 integration tests require GAMS installed with the TIMES source code at `/tmp/TIMES_model`. They skip gracefully if GAMS is not available. The remaining 28 unit tests run without any external dependencies.
 
@@ -360,7 +409,7 @@ This is not a full replacement for the entire TIMES modeling workflow. It does n
 - Import spreadsheet templates directly
 - Run GAMS or manage solver execution
 - Read or visualize model results
-- Provide a graphical user interface
+- Provide a hosted multi-user UI with auth/collaboration (the current interface is local-first preview)
 
 It is the **data layer** — the part that handles model representation, validation, and compilation. It is designed to integrate cleanly with established TIMES practices while enabling programmatic workflows.
 

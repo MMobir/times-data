@@ -6,3 +6,5 @@ build/
 .venv/
 .env
 .pytest_cache/
+node_modules/
+interface/frontend/dist/

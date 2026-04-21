@@ -19,6 +19,10 @@ Use this checklist before creating any tag/release.
   - Windows: `py -m pip install -e ".[dev]"`
 - [ ] Critical lint passes: `python3 -m ruff check . --select E9,F63,F7,F82` (or `py -m ruff ...` on Windows)
 - [ ] Test suite passes: `python3 -m pytest tests/ -v` (or `py -m pytest tests/ -v` on Windows)
+- [ ] Backend API tests pass: `python3 -m pytest interface/backend/tests -v`
+- [ ] Frontend tests pass:
+  - `cd interface/frontend && npm install`
+  - `npm run test`
 - [ ] Integration tests behavior is expected (pass where possible, skip gracefully if GAMS/TIMES source unavailable).
 
 ## 3) Functional smoke tests (required)
@@ -32,11 +36,14 @@ Use this checklist before creating any tag/release.
   2. `times-data info imported-model/`
   3. `times-data validate imported-model/`
   4. `times-data export-dd imported-model/ -o imported-build/`
+- [ ] Interface backend smoke check: `python3 scripts/smoke_interface.py`
+- [ ] Frontend smoke check: `bash scripts/smoke_frontend.sh`
 
 ## 4) Documentation checks
 
 - [ ] README commands are copy-paste runnable.
 - [ ] README clearly states two entry paths: from-scratch Python and DD import.
+- [ ] README includes local interface backend/frontend startup instructions.
 - [ ] README clearly states current scope and limitations.
 - [ ] Known license constraints are described precisely (community/commercial scope wording).
 

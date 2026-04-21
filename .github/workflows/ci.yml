@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  test:
+  python-test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -37,3 +37,9 @@ jobs:
 
       - name: Smoke release flow
         run: python scripts/smoke_release.py
+
+      - name: Backend API tests
+        run: python -m pytest interface/backend/tests -q
+
+      - name: Smoke interface backend flow
+        run: python scripts/smoke_interface.py
